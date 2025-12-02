@@ -1,17 +1,14 @@
-import lines from "./input.txt" with { type: "text" };
+import { readFileSync } from "fs";
+import {species, isDial, interpret} from "./lib";
 
-const interpret = cmd => ({'L':-1,'R':1}[cmd[0]]) * parseInt(cmd.slice(1));
+const lines = readFileSync("input.txt", "utf-8");
 
 const trace = [];
 
 let inputs = lines.split('\n')
   .filter(l => !!l)
-//  .filter((_,i) => i<50)
   .map(interpret);
 
-
-const isDial = n => ((n%100)+100)%100 === 0;
-const species = n => n < 0 ? Math.ceil((n+1)/100)-1 : Math.floor(n/100);
 
 let count = 0;
 let pos = inputs.reduce((acc,e) => {
