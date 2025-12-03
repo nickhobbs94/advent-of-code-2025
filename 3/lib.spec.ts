@@ -7,5 +7,5 @@ const testInput = `987654321111111
 818181911112111`;
 
 test("test input", () => {
-  expect(main(testInput)).toBe(357);
+  expect(main(testInput)).toBe(3121910778619);
 });
