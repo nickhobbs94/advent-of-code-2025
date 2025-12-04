@@ -14,5 +14,5 @@ const testInput =
 @.@.@@@.@.`;
 
 test("test input", () => {
-  expect(main(testInput)).toBe(13);
+  expect(main(testInput)).toBe(43);
 });
