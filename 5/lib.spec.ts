@@ -15,5 +15,15 @@ const testInput =
 32`;
 
 test("test input", () => {
-  expect(main(testInput)).toBe(3);
+  expect(main(testInput)).toBe(14);
 });
+
+
+test("test pathological", () => {
+  const input = `10-11
+  9-12
+  8-13
+  
+  `;
+  expect(main(input)).toBe(6);
+})
