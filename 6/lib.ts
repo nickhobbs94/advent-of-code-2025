@@ -1,37 +1,42 @@
 import assert from "node:assert/strict";
 
 export function parseData(data: string) {
-    return data.split('\n')
-        .filter(row => !!row)
-        .map(row => row
-            .replace(/^\s+/, '')
-            .replace(/\s+/g, ' ')
-            .split(' '));
-
-}
-
-function transpose<T>(grid: T[][]): T[][] {
-    let height = grid.length;
-    let width = grid[0].length;
-
-    const result = [];
-    for (let x=0; x<width; x++) {
-        if (!grid[0][x]) continue;
-        result.push([]);
-        for (let y=0; y<height; y++) {
-            result[x][y] = grid[y][x];
+    const rows = data.split('\n').filter(row => !!row);
+    const separators = [];
+    for (let i=0; i<rows[0].length; i++) {
+        let found = true;
+        for (let y=0; y<rows.length; y++) {
+            if (rows[y][i] !== ' ') found = false;
         }
+        if (found) separators.push(i);
     }
+    separators.push(rows[0].length)
 
-    return result;
+    const groups = [];
+    for (let i=0; i<separators.length; i++) {
+        const max = separators[i] ?? rows[0].length;
+        let min = separators[i-1];
+        if (min) min++;
+        min ??= 0;
+
+        const group = [];
+        for (let col = min; col<max; col++) {
+            let s = '';
+            for (let y=0; y<rows.length-1; y++) {
+                s += rows[y][col];
+            }
+            group.push(parseInt(s));
+        }
+        group.push(rows[rows.length-1].slice(min,max).replace(/\s+/g, ''));
+        groups.push(group);
+    }
+    return groups;
 }
 
 export function main(data: string) {
     const inputs = parseData(data);
 
-    const ops = transpose(inputs);
-
-    return ops.reduce((sum, g) => {
+    return inputs.reduce((sum, g) => {
         const cmd = g.pop() as string;
 
         const n = g.map(e => parseInt(e));

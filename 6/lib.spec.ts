@@ -8,7 +8,7 @@ const testInput =
 *   +   *   +  `;
 
 test("test input", () => {
-  expect(main(testInput)).toBe(4277556);
+  expect(main(testInput)).toBe(3263827);
 });
 
 // test("test parser", () => {
