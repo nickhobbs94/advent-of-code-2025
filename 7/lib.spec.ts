@@ -20,7 +20,7 @@ const testInput =
 ...............`;
 
 test("test input", () => {
-  expect(main(testInput)).toBe(21);
+  expect(main(testInput)).toBe(40);
 });
 
 // test("test parser", () => {

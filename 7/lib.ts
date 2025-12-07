@@ -8,25 +8,24 @@ export function main(data: string) {
     const rows = parseData(data);
 
     let row = rows.pop().split('');
-    let positions = new Set();
-    positions.add(row.findIndex(s => s === 'S'));
+    let positions = [];
+    positions[row.findIndex(s => s === 'S')] = 1;
 
-    let splitcount = 0;
     while (rows.length) {
         row = rows.pop().split('');
+        let newpos = positions.slice();
         for (let i=0; i<row.length; i++) {
-            if (positions.has(i) && row[i] === '^') {
-                positions.delete(i);
-                positions.add(i+1);
-                positions.add(i-1);
-                row[i-1] = '|';
-                splitcount++;
+            if (row[i] === '^') {
+                newpos[i-1] ??= 0;
+                newpos[i+1] ??= 0;
+                newpos[i-1] += positions[i];
+                newpos[i+1] += positions[i];
+                newpos[i] = 0;
             }
-            row[i] = positions.has(i) ? '|' : row[i];
         }
-        console.log(row.join(''));
+        positions = newpos;
     }
 
-    return splitcount;
+    return positions.reduce((acc, e) => acc + e, 0);
 }
 
