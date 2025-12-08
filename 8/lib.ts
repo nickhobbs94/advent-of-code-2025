@@ -65,20 +65,31 @@ function connect(circuits, a, b) {
     // console.log(allcircs);
 }
 
-export function main(data: string, connections: number) {
+export function main(data: string) {
     const boxes = parseData(data);
 
     const circuits = {};
 
-    const next = closest(boxes).slice(0, connections);
+    const next = closest(boxes);
 
+    const allconnected = () => {
+        for (let box of boxes) {
+            if (!circuits[`${box}`]) return false;
+        }
+        return true;
+    }
+
+    let last = null;
     for (const c of next) {
         const [a,b] = c.pair;
         connect(circuits, a, b);
+        if (allconnected()) {
+            console.log("ALLCON", a, b);
+            return a[0] * b[0];
+            break;
+        }
     }
     
-    return allcircs.filter(circ => !circ.deleted)
-        .sort((c1, c2) => c2.boxCount - c1.boxCount)
-        .slice(0,3).reduce((acc,e) => acc*e.boxCount, 1);
+    return 0;
 }
 

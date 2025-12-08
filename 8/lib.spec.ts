@@ -24,12 +24,9 @@ const testInput =
 425,690,689`;
 
 test("test input", () => {
-  expect(main(testInput, 10)).toBe(40);
+  expect(main(testInput)).toBe(25272);
 });
 
-test("test sorter", () => {
-  expect(closest(parseData(testInput))[0].pair).toEqual([[162,817,812], [425,690,689]]);
-});
 
 // test("test parser len", () => {
 //   expect(parseData(testInput).length).toBe(4);
