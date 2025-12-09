@@ -13,7 +13,7 @@ const testInput =
 `;
 
 test("test input", () => {
-  expect(main(testInput)).toBe(50);
+  expect(main(testInput)).toBe(24);
 });
 
 
