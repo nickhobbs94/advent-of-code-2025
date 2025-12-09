@@ -22,7 +22,8 @@ function fillGreenLines(corners: [number, number][], green: Set<string>) {
 
 
 function fillGreenSpace(corners: [number, number][], greenSet: Set<string>, width: number, height: number) {
-    const red = (x,y) => !!corners.filter(c => c[0] === x && c[1] === y).length;
+    const redSet = new Set(corners.map(c => `${c[0]}, ${c[1]}`));
+    const red = (x,y) => redSet.has(`${x},${y}`);
     const green = (x,y) => greenSet.has(`${x},${y}`);
     const boundary = (x: number,y:number) => red(x,y) || green(x,y);
 
@@ -95,7 +96,8 @@ export function main(data: string) {
     console.log("Space done");
     
     const valid = (a, b, corners: [number, number][], greenSet: Set<string>) => {
-        const red = (x,y) => !!corners.filter(c => c[0] === x && c[1] === y).length;
+        const redSet = new Set(corners.map(c => `${c[0]}, ${c[1]}`));
+        const red = (x,y) => redSet.has(`${x},${y}`);
         const green = (x,y) => greenSet.has(`${x},${y}`);
         const inside = (x: number,y:number) => red(x,y) || green(x,y);
         let W = b[0] - a[0];
