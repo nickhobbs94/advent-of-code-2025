@@ -85,52 +85,68 @@ function area(a,b) {
     return X*Y;
 }
 
+enum Direction {
+    N = "N",
+    E = "E",
+    S = "S",
+    W = "W",
+}
+
+enum Corner {
+    Straight,
+}
+
+function dir(a,b) {
+    if (a[1] < b[1]) return Direction.S;
+    if (a[1] > b[1]) return Direction.N;
+    if (a[0] < b[0]) return Direction.E;
+    if (a[0] > b[0]) return Direction.W;
+    throw new Error("Unhandled exception");
+}
+
 export function main(data: string) {
     const corners = parseData(data);
-    const width = corners.reduce((acc, e) => Math.max(acc, e[0]), 0) + 1;
-    const height = corners.reduce((acc, e) => Math.max(acc, e[1]), 0) + 1;
-    const green = new Set<string>();
-    fillGreenLines(corners, green);
-    console.log("Lines done");
-    fillGreenSpace(corners, green, width, height);
-    console.log("Space done");
-    
-    const valid = (a, b, corners: [number, number][], greenSet: Set<string>) => {
-        const redSet = new Set(corners.map(c => `${c[0]}, ${c[1]}`));
-        const red = (x,y) => redSet.has(`${x},${y}`);
-        const green = (x,y) => greenSet.has(`${x},${y}`);
-        const inside = (x: number,y:number) => red(x,y) || green(x,y);
-        let W = b[0] - a[0];
-        let H = b[1] - a[1];
-        let dx = 1;
-        let dy = 1;
+    const augmentedCorners = [];
 
-        if (W < 0) dx = -1;
-        if (H < 0) dy = -1;
+    for (let i=0; i<corners.length; i++) {
+        let prev = corners[(i-1+corners.length) % corners.length];
+        let curr = corners[i];
+        let next = corners[(i+1) % corners.length];
 
-        for (let y=a[1]; y!==b[1]; y+=dy) {
-            for (let x=a[0]; x!==b[0]; x+=dx) {
-                if (!inside(x,y)) return false;
-            }
-        }
+        let before = dir(prev, curr);
+        let after = dir(curr, next);
 
-        return true;
+        const turns = {
+            [Direction.N]: {
+                [Direction.N]: "Straight",
+                [Direction.S]: "IMPOSSIBLE",
+                [Direction.E]: "Right",
+                [Direction.W]: "Left",
+            },
+            [Direction.S]: {
+                [Direction.N]: "IMPOSSIBLE",
+                [Direction.S]: "Straight",
+                [Direction.E]: "Left",
+                [Direction.W]: "Right",
+            },
+            [Direction.E]: {
+                [Direction.N]: "Left",
+                [Direction.S]: "Right",
+                [Direction.E]: "Straight",
+                [Direction.W]: "IMPOSSIBLE",
+            },
+            [Direction.W]: {
+                [Direction.N]: "Right",
+                [Direction.S]: "Left",
+                [Direction.E]: "IMPOSSIBLE",
+                [Direction.W]: "Straight",
+            },
+        };
 
+        console.log(prev, curr, next, turns[before][after], before, after)
+        
     }
 
-    // printGrid(corners, green, width, height);
-
-    let largest = 0;
-    for (let i=0; i<corners.length-1; i++) {
-        for (let j=i+1; j<corners.length; j++) {
-            console.log(i,j);
-            const a = corners[i];
-            const b = corners[j];
-            if (!valid(a,b, corners, green)) continue;
-            largest = Math.max(area(a,b), largest);
-        }
-    }
-    return largest;
 }
 
 
