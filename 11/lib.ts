@@ -23,28 +23,24 @@ class Network {
     }
 }
 
-type Visits = {dac?: true, fft?: true};
+const memos: Record<string, number> = {};
 
-function countPaths(network: Network, start: string, end: string, dac: boolean, fft: boolean) {
+function countPaths(network: Network, start: string, end: string) {
+    const k = `${start}:${end}`;
+    const mem = memos[k];
+    if (mem !== undefined) return mem;
+
     if (start === end) {
-        if (fft && dac) return 1;
-        return 0;
-    };
-
-    if (start === 'dac') {
-        dac = true;
-    }
-
-    if (start === 'fft') {
-        fft = true;
+        return 1;
     }
 
     let count = 0;
 
     let children = network.get(start);
     for (let child of children) {
-        count += countPaths(network, child, end, dac, fft);
+        count += countPaths(network, child, end);
     }
+    memos[k] = count;
     return count;
 }
 
@@ -53,7 +49,21 @@ export function main(data: string) {
     
     const network = new Network(inputs);
 
-    return countPaths(network, 'svr', 'out', false, false);
+    const svr2dac = countPaths(network, 'svr', 'dac');
+    console.log({svr2dac});
+    const dac2fft = countPaths(network, 'dac', 'fft');
+    console.log({dac2fft});
+    const fft2out = countPaths(network, 'fft', 'out');
+    console.log({fft2out});
+
+    const svr2fft = countPaths(network, 'svr', 'fft');
+    console.log({svr2fft});
+    const fft2dac = countPaths(network, 'fft', 'dac');
+    console.log({fft2dac});
+    const dac2out = countPaths(network, 'dac', 'out');
+    console.log({dac2out});
+
+    return svr2dac*dac2fft*fft2out + svr2fft*fft2dac*dac2out;
 }
 
 
