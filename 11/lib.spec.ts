@@ -1,20 +1,23 @@
 import { test, expect } from "bun:test";
-import { main, parseData, ButtonPresser, Lights, solve } from "./lib";
+import { main } from "./lib";
 
 const testInput = 
-`aaa: you hhh
-you: bbb ccc
-bbb: ddd eee
-ccc: ddd eee fff
-ddd: ggg
-eee: out
-fff: out
+`svr: aaa bbb
+aaa: fft
+fft: ccc
+bbb: tty
+tty: ccc
+ccc: ddd eee
+ddd: hub
+hub: fff
+eee: dac
+dac: fff
+fff: ggg hhh
 ggg: out
-hhh: ccc fff iii
-iii: out
+hhh: out
 `;
 
 test("test input", () => {
-  expect(main(testInput)).toBe(5);
+  expect(main(testInput)).toBe(2);
 });
 

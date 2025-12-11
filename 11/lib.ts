@@ -23,13 +23,27 @@ class Network {
     }
 }
 
-function countPaths(network: Network, start: string, end: string) {
-    if (start === end) return 1;
+type Visits = {dac?: true, fft?: true};
+
+function countPaths(network: Network, start: string, end: string, dac: boolean, fft: boolean) {
+    if (start === end) {
+        if (fft && dac) return 1;
+        return 0;
+    };
+
+    if (start === 'dac') {
+        dac = true;
+    }
+
+    if (start === 'fft') {
+        fft = true;
+    }
+
     let count = 0;
 
     let children = network.get(start);
     for (let child of children) {
-        count += countPaths(network, child, end);
+        count += countPaths(network, child, end, dac, fft);
     }
     return count;
 }
@@ -39,7 +53,7 @@ export function main(data: string) {
     
     const network = new Network(inputs);
 
-    return countPaths(network, 'you', 'out');
+    return countPaths(network, 'svr', 'out', false, false);
 }
 
 
