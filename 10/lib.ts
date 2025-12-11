@@ -1,4 +1,6 @@
-import assert from "node:assert/strict";
+function assert(b: boolean) {
+    if (!b) throw new Error("Failed assert");
+}
 
 function parseGoal(s: string){
     let goal = 0;
@@ -19,6 +21,12 @@ function parseConnections(s: string[]) {
     })
 }
 
+function parseJoltage(s: string) {
+    assert(s[0] === '{' && s[s.length-1] === '}');
+    s = s.slice(1,s.length-1);
+    return s.split(',').map(i => parseInt(i));
+}
+
 export function parseData(data: string){
     return data.split('\n').filter(row => !!row)
         .map(row => {
@@ -26,46 +34,87 @@ export function parseData(data: string){
             return [
                 parseGoal(items[0]), 
                 parseConnections(items.slice(1,items.length-1)),
-                [],
+                parseJoltage(items[items.length-1]),
             ]}
         ) as [number, number[][], number[]][];
 }
 
-class Lights {
-    constructor(private buttons: number[][]){}
+export class Lights {
+    private arrayLen: number;
+    constructor(private buttons: number[][]){
+        this.arrayLen = buttons.reduce((acc,e) => Math.max(
+            e.reduce((acc2, e2) => Math.max(acc2, e2), 0)
+            ,acc), 0);
+    }
 
-    private button(i: number): number {
-        let output = 0;
+    private button(i: number, output: number[]): number[] {
         for (let b of this.buttons[i]) {
-            output += 2**b;
+            output[b] ??= 0;
+            output[b]++;
         }
         return output;
     }
 
-    switch(input: number): number {
-        let output = 0;
-        for (let i=0; i<this.buttons.length; i++) {
-            if (input & 2**i) {
-                output ^= this.button(i);
-            }
+    switch(inputs: number[]): number[] {
+        let output = Array(this.arrayLen+1).fill(0);
+        for (let i=0; i<inputs.length; i++) {
+            this.button(inputs[i], output);
         }
         return output;
     }
 }
 
-const countbits = (n: number): number => !n ? 0 : (n & 1) + countbits(n >>= 1);
+export class ButtonPresser {
+    private i: number;
+    constructor(private buttons: unknown[]){
+        this.i = 0;
+    }
 
-export function solve(goal: number, buttons: number[][]) {
+    iter(): number[] {
+        let ans = this.get();
+        this.i++;
+        return ans;
+    }
+
+    set(i: number) {
+        this.i = i;
+    }
+
+    private get(): number[] {
+        if (this.i === 0) return [0];
+        let result = [];
+
+        let x = this.i
+
+        let d = this.buttons.length;
+        while (x) {
+            let r = x % d;
+            result.push(r);
+            x = Math.floor(x / d);
+        }
+        
+        return result;
+    }
+}
+
+function goalHit(goal: number[], lights: number[]) {
+    // console.log(goal, lights)
+    for (let i=0; i<goal.length; i++) {
+        if (goal[i] !== (lights[i] ?? 0)) return false;
+    }
+    return true;
+}
+
+export function solve(goal: number[], buttons: number[][]) {
     const lights = new Lights(buttons);
-    let best;
-    for (let i=0; i<2**buttons.length; i++) {
+    const presser = new ButtonPresser(buttons);
+    while (true) {
+        let i = presser.iter();
         const output = lights.switch(i);
-        if (output === goal) {
-            best ??= countbits(i);
-            best = Math.min(countbits(i), best);
+        if (goalHit(goal, output)) {
+            return i.length;
         }
     }
-    return best;
 }
 
 export function main(data: string) {
@@ -73,7 +122,9 @@ export function main(data: string) {
     
     let sum = 0;
     for (let i of inputs) {
-        sum += solve(i[0], i[1]);
+        const result = solve(i[2], i[1]);
+        console.log(result);
+        sum += result;
     }
     return sum;
 }
